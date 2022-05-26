@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Visitor API
+  version: 1.0.0
+security:
+  - ApiKeyAuth: []
+  
+paths:
+  /api/visitors:
+    get:
+      summary: Get Visitors list
+      tags:
+        - Visitor
+      responses:
+        '200':
+          description: Visitors List
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Visitor'
+              example:
+                - nickname: "И1CKИAM3"
+                  visit_time: "2022-05-25T18:26:01Z"
+                - nickname: "visitorRRR"
+                  visit_time: "2022-05-26T14:46:02Z"
+                - nickname: "deadinside"
+                  visit_time: "2022-05-26T16:37:04Z"
+        '500':
+          description: Internal Service Error
+  /api/visitor:
+    post:
+      summary: Register Visitor.
+      tags: 
+        - Visitor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Visitor'
+            example:
+              nickname: "И1CKИAM3"
+      responses:
+        '201':
+          description: Success
+        '409':
+          description: Duplicate (Visitor with such a nickname has already been existing)
+        '422':
+          description: Incorrect Request
+        '500':
+          description: Internal Server Error
+  /api/theme:
+    get:
+      summary: Get Theme Info
+      tags:
+        - Theme
+      responses:
+        '200':
+          description: Theme Info
+          content:
+            application/json:
+              schema: 
+                type: object
+                items: 
+                  $ref: '#/components/schemas/Theme'
+              example:
+                color: "yellow"
+        '500':
+          description: Internal Service Error
+    put:
+      summary: Update Theme
+      tags: 
+        - Theme
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Theme'
+            example:
+              color: "blue"
+      responses:
+        '200':
+          description: Success
+        '422':
+          description: Incorrect Request
+        '500':
+          description: Internal Server Error
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-auth-token
+  schemas:
+    Visitor:
+      type: object
+      required:
+        - nickname
+      properties:
+        nickname:
+          type: string
+          description: Nickname
+        visit_time:
+          type: string
+          description: Datetime, RFC 3339
+    Theme:
+      type: object
+      required:
+        - color
+      properties:
+        color:
+          $ref: '#/components/schemas/ThemeColor'
+    ThemeColor:
+      type: string
+      description: Theme color
+      default: green
+      enum:
+        - red
+        - green
+        - blue
+        - yellow

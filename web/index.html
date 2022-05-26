@@ -1,0 +1,125 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Visitor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+  
+    <style type="text/css">
+        #content {
+            background-color:
+                {{if eq .Theme.Color "red"}}
+                #FFEBEB;
+                {{else if eq .Theme.Color "green"}}
+                #EBFFEF;
+                {{else if eq .Theme.Color "blue"}}
+                #EBEEFF;
+                {{else if eq .Theme.Color "yellow"}}
+                #FFFFEB;
+                {{end}}
+        }
+    
+        #rows {
+            background-color:
+                {{if eq .Theme.Color "red"}}
+                #FFD8D8;
+                {{else if eq .Theme.Color "green"}}
+                #DAFFDC;
+                {{else if eq .Theme.Color "blue"}}
+                #DADAFF;
+                {{else if eq .Theme.Color "yellow"}}
+                #FFFFDA;
+                {{end}}
+        }
+    </style>
+
+</head>
+<body>
+
+<script>
+    function prepareFormJSON(selector) {
+        let arr = $(selector).serializeArray();
+        let data = {};
+        
+        $.map(arr, function (n, i) {
+            data[n['name']] = n['value'];
+        });
+  
+        return JSON.stringify(data)
+    }
+  
+    function save() {
+        $.ajax({
+            type: 'POST',
+            data: prepareFormJSON('.form'),
+            url: '/',
+            success: function () {
+                window.location.reload(true);
+            },
+            error: function () {
+                $('#incorrect-nickname').transition('scale');
+            }
+        });
+    }
+</script>
+
+<div id="content" class="ui padded container segment">
+    <form class="ui large form" method="post">
+        <div id="incorrect-nickname" class="ui negative message transition hidden">
+            <div class="header">
+                Your Nickname either is incorrect or has already been existed :(
+            </div>
+            <p>Please try again</p>
+        </div>
+    
+        <div class="field">
+            <div class="ui">
+                <input type="text" name="nickname" placeholder="Your Nickname">
+            </div>
+        </div>
+                
+        <button class="ui fluid large
+            {{if eq .Theme.Color "red"}}
+            red
+            {{else if eq .Theme.Color "green"}}
+            teal
+            {{else if eq .Theme.Color "blue"}}
+            vk
+            {{else if eq .Theme.Color "yellow"}}
+            yellow
+            {{end}}
+        submit button bottom" type="button" onclick="save();">Become a Visitor!</button>
+    </form>
+  
+    <div class="main ui container left aligned">
+        {{if eq .VisitorsCount 0}}
+        <div class="ui header">It seems nobody has become a Visitor yet :(</div>
+        <div class="ui header">But you may be the first one!</div>
+        {{else}}
+        <div class="ui header">We are already {{.VisitorsCount}}!</div>
+        <div class="ui header">People have become Visitors by now:</div>
+        
+        <table class="ui table">
+            <thead>
+                <tr>
+                    <th class="two wide">Nickname</th>
+                    <th class="one wide">Visit Time</th>
+                </tr>
+            </thead>
+            
+            <tbody id="rows">
+                {{range .Visitors}}
+                <tr>
+                    <td data-label="Nickname">{{.Nickname}}</td>
+                    <td data-label="VisitTime">{{.VisitTime.Format "15:04:05 02.01.2006"}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{end}}
+    </div>
+</div>
+
+</body>
+</html>
